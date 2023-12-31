@@ -1,0 +1,35 @@
+------------------------------------------------------
+
+원시타입
+
+1. boolean
+=> true | false
+=> js에는 진짜 boolean값이 아님에도 특정 boolean처럼 
+   취급하는 Truthy / Falsy개념이 있음
+
+
+
+undefined
+=> 값을 명시적으로 정의하지 않음
+=> 변수선언했지만 값할당 안했거나, 옵셔널로 지정된 값은 undefined
+
+null
+=> 명시/의도적으로 빈 값을 표현
+
+number
+=> 숫자, NaN/Infinity도 포함
+
+string
+=> 문자열
+
+symbol
+=> es2015에 도입된 타입
+=> 중복되지 않는 유니크 값 생성
+
+const MOVIE_TITLE = Symbol("title")
+const MUSIC_TITLE = Symbol("title")
+console.log(MOVIE_TITLE === MUSIC_TITLE); // false
+
+const SYMBOL: unique symbol = Symbol(); 
+
+------------------------------------------------------

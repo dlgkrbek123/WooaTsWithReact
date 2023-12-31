@@ -1,0 +1,58 @@
+------------------------------------------------------
+
+object
+=> 프리미티브 타입을 제외한 모든 것
+=> 매우 광범위해서, 가급적 사용하지 말도록 권장
+=> any 타입처럼 모든 것이 가능해서 정적 타이핑 의미 퇴색
+
+------------------------------------------------------
+
+객체 리터럴
+=> 타이핑되는 개체가 선언한 구조와 일치해야함을 의미
+=> 프로퍼티를 동적으로 추가하는 걸 막음
+
+------------------------------------------------------
+
+array
+=> Array키워드나 []로 배열 타입을 선언
+=> 기본적으로 단일 타입의 배열만 인정
+=> 튜플타입도 []로 선언함
+
+const getCartList = async (cardId: number[]) => {
+  const res = await CartApi.GET_CART_LIST(cardId)
+  return res.getData();
+}
+
+------------------------------------------------------
+
+객체 타이핑은 type, interface 키워드를 사용
+=> 객체 리터럴 방식
+=> 컴파일러가 자동으로 타입을 추론해주니까 모든 변수에 일일이 명시적
+   타입 선언할 필요는 없다.
+
+type NoticePopupType = {
+  title: string;
+  description: string;
+}
+
+interface INoticePopup {
+  title: string;
+  description: string;
+}
+
+const noticePopup1: NoticePopupType = {...};
+const noticePopup2: INoticePopup = {...};
+
+------------------------------------------------------
+
+function
+=> 함수도 객체지만 typeof로 연산지 별개의 문자열이 리턴
+=> 호출 시그니쳐는 화살표함수와 유사
+
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+type add = (a: number, b: number) => number;
+
+------------------------------------------------------
