@@ -1,0 +1,96 @@
+------------------------------------------------------------------------------------------------------------
+
+1. Intersection (&)
+=> 여러가지 타입을 결합한 단일 타입
+=> 대상이 된 타입들의 모든 멤버를 가지는 새로운 타입 생성
+=> 대상 타입을 모두 만족시켜야 하므로 집합적으로 좁음
+
+type ProductItem = {
+  id: number;
+  name: string;
+}
+
+type ProductItemWithDiscount = ProductItem & { discountAmount: numbe };
+
+------------------------------------------------------------------------------------------------------------
+
+2. Union (|)
+=> 여러가지 타입을 결합한 단일 타입
+=> 둘중 하나만 만족시키면 됨
+=> 특정변수가 가질 수 있는 모든 타입을 나열하는 용도
+
+------------------------------------------------------------------------------------------------------------
+
+3. 인덱스 시그니처
+=> 타입의 속성 이름은 모르지만 속성값의 타입은 알고 있을떄 사용
+=> 아는 속성 이름은 명시 가능한데, 속성값이 인덱스 시그니쳐에 포함되어야함
+
+
+// 프로퍼티 키는 모두 string타입, 값을 number타입
+interface IndexSignatureEx {
+  [key: string]: number;
+}
+
+// 명시된 속성은 인덱스 시그니쳐에 포함되어야함
+interface IndexSignatureEx2 {
+  [key: string]: number | boolean;
+  length: number;
+  isValid: boolean;
+  name: string; // 에러 발생
+}
+
+------------------------------------------------------------------------------------------------------------
+
+4. 인덱스드 액세스 타입
+=> 다른 타입의 특정 속성이 가지는 타입을 조회하기 위해 사용
+=> 배열에도 사용가능
+
+type Example = {
+  a: number;
+  b: string;
+  c: boolean;
+}
+
+type IndexAccess = Example["a"]; // number
+type IndexAccess = Example["a" | "b"]; // number | string
+type IndexAccess = Example[keyof Example]; // number | string | boolean
+
+------------------------------------------------------------------------------------------------------------
+
+5. 맵드타입
+=> map은 목록 A를 목록 B로 변환하는 것
+=> 다른 타입을 기반으로 한 타입을 선언할 때 사용
+=> 반복을 줄일 수 있음
+
+=> 매핑할때 readonly와 ?를 수식어로 적용
+=> ?는 선택적 매개변수로 만듦
+=> -를 readonly나 ?앞에 입력해 기능을 제거가능
+
+type Example = {
+  a: number;
+  b: string;
+  c: boolean;
+}
+
+type Subset<T> = {
+  [K in keyof T]?: T[K]
+}
+
+// as로 이름 재지정
+type BottomSheetStore = {
+  [index in BOTTOM_SHEET_ID as `${index}_BOTTOM_SHEET`]: {
+    resolver?: (payload: any) => void;
+    args?: any;
+    isOpened: boolean;
+  }
+}
+
+------------------------------------------------------------------------------------------------------------
+
+6. 템플릿 리터럴 타입
+=> 템플릿 리터럴을 사용하여 문자열 리터럴 타입을 선언하는 문법
+
+type Stage = "init" | "select-image";
+type StageName = `${Stage}-stage`;
+
+------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,62 @@
+------------------------------------------------------------------------------------------------------------
+
+제네릭
+=> 다양한 타입간 재사용성을 높이기 위해 사용하는 문법
+=> 타입을 미리 정해두지 않고 타입변수를 사용해서 비워둔 후, 
+   실제 사용할때 외부에서 타입을 지정하여 사용하는 방식
+
+type ExampleArrayType<T> = T[];
+const array1: ExampleArrayType<string> = ["치킨", "피자", "우동"]
+
+
+=> 제네릭 함수호출시 항상 항상 꺽쇠괄호안에 타입을 명시해야 하는 것은 아니다.
+function exampleFunc<T>(arg: T): T[] {
+  return new Array(3).fill(arg);
+}
+exampleFunc("hello"); // 추론을 해주어서 문제없음
+
+
+=> 특정 요소 타입을 알 수없을때 제네릭 타입에 기본값 추가
+interface SubmitEvent<T = HTMLElement> extends SyntheticEvent<T> {
+  submitter: T;
+}
+
+=> tsx에서 사용시 <>가 태그로 인식될 수 있다.
+=> 제네릭 부분에 extends를 사용해서 컴파일러에게 힌트주면 해결
+const arrowExampleFunc2 = <T extends {}>(arg: T): T[] => {
+  return new Array(3).fill(arg);
+}
+
+------------------------------------------------------------------------------------------------------------
+
+=> 제네릭 타입에 제약 추가가능
+=> 제약된 키는 바운드 타입 파라미터라고 불림
+=> 대상이 된 타입은 상한한계
+interface TypeWithLength {
+  length: number;
+}
+function exampleFunc<T extends TypeWithLength>(arg: T): number {
+  return arg.length;
+}
+
+=> 제네릭은 API응답값의 타입을 지정할떄 제일 많이 쓰임
+
+export interface MobileApiResponse<Data> {
+  data: Data;
+  statusCode: string;
+  statusMessage?: string;
+}
+
+const fetchPriceInfo = ():Promise<MobileApiResponse<PriceInfo>> => {
+  //
+
+  return request({
+    method: "GET",
+    url: priceUrl
+  })
+}
+
+=> 하지만 제네릭이 가독성을 해치고, 코드길이를 늘리기만 할수도 있다.
+
+
+------------------------------------------------------------------------------------------------------------
