@@ -1,0 +1,55 @@
+------------------------------------------------------------------------------------------------------------
+
+조건부 타입
+=> 조건에 따라 출력타입을 다르게 도출
+=> CONDITION ? A : B
+
+------------------------------------------------------------------------------------------------------------
+
+1. extends와 제네릭을 활용한 조건부 타입
+
+  T extends U ? X : Y
+  => 타입 T가 U를 확장한다면 X, 아니라면 Y타입으로 결정
+
+!! 예제
+interface Bank {
+  financialCode: string;
+  companyName: string;
+  name: string;
+  fullName: string;
+}
+interface Card {
+  financialCode: string;
+  companyName: string;
+  name: string;
+  appCardType?: string;
+}
+
+type PayMethodType<T extends "card" | "appcard" | "bank"> = T extends 
+| "card"
+| "appcard"
+? Card
+: Bank
+// 제네릭에 전달받은 값이 card나 appcard면 Card타입, 아니라면 Bank타입
+
+export const useGetRegisteredList = <T extends "card" | "appcard" | "bank">(type: T): UseQueryResult<PayMethodType<T>[]> => {
+  const url = `baeminpay/codes/${type === 'appcard' ? "card" : "type"}`
+
+  const fetcher = fetcherFactory<PayMethodType<T>[]>({
+    onSuccess: (res) => {
+      return res?.filter((pocket : PocketInfo<Card> | PocketInfo<Bank>) => pocket?.useType === "USE") ?? []
+    } 
+  })
+  const result = useCompanyQuery<PayMethodType<T>[]>(url, undefined, fetcher);
+
+  return result;
+}
+// type인자에 따라 PocketInfo<Card>[]를 뱉거나 PocketInfo<Bank>를 리턴
+
+------------------------------------------------------------------------------------------------------------
+
+infer키워드
+=> 제네릭으로 앞에 붙는 키워드로 넘어오는 타입을 미래로 추론시킴
+=> 제네릭 extends 삼항연산자랑 같이 쓰인다.
+
+------------------------------------------------------------------------------------------------------------
