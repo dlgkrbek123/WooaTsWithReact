@@ -1,0 +1,114 @@
+------------------------------------------------------------------------------------------------------------
+
+타입 좁히기
+=> 변수 또는 표현식의 타입 범위를 더 작은 범위로 좁힘
+=> 정확하고 명시적인 타입추론, 타입 안정성 확보
+
+ts의 분기처리는 조건문과 타입가드를 활용하여 변수나 표현식의 
+범위를 좁혀 다른 상황에 다른동작을 수행하게 하는 것
+
+------------------------------------------------------------------------------------------------------------
+
+타입가드
+=> 런타임에 조건문을 사용하여 타입을 검사하고 타입 범위를 좁혀주는 기능
+=> 1. 연산자를 사용한 타입가드(typeof, instanceof, in)
+  => 특정 타입 값을 가질 수밖에 없는 상황을 유도하여 좁힘
+  => 런타임에 유효한 타입가드를 생성(js)
+
+=> 2. 사용자 정의 타입가드
+
+------------------------------------------------------------------------------------------------------------
+
+typeof 연산자
+=> 원시타입을 추론
+=> js타입 시스템에만 대응가능 
+=> null과 객체타입을 판별하기에는 한계
+
+string, number, boolean
+undefined, object, function
+
+!! 예제
+const replaceHyphen: (date: string | Date) => string | Date = (date) => {
+  if(typeof date === "string") {
+    retrun date.replace(/-/g, "/")
+  }
+
+  return date
+}
+
+------------------------------------------------------------------------------------------------------------
+
+instanceof 연산자
+=> 인스턴스화된 객체 타입을 판별
+=> 프로토타입 체인에 생성자가 있는지 확인해서 true, false를 리턴
+
+!! 예제
+interface Range {
+  start: Date;
+  end: Date;
+}
+
+interface DatePickerProps {
+  selectedDates?: Date | Range;
+}
+
+const DatePiccker = ({ selectedDates }: DatePickerProps) => {
+  const [selected, setSelected] = useState(convertToRange(selectedDates))
+}
+
+function convertToRange(selected?: Date | Range): Range | undefined {
+  return selected instanceof Date 
+    ? { start: selected, end: selected }
+    : selected
+}
+
+!! 예제2
+const onKeyDown = (event: React.KeyboardEvent) => {
+  if(event.target instanceof HTMLInputElement && event.key === 'Enter') {
+    event.target.blur(); // 인풋일때만 blur가 있으므로 분기
+    onXYZ(event)
+  }
+}
+
+------------------------------------------------------------------------------------------------------------
+
+in 연산자
+=> 객체에 속성 존재여부를 확인하여 boolean 리턴
+=> 속성의 값이 undefined여도 true를 리턴
+=> delete로 지우면 false리턴
+
+!! 예제
+=> 여러객체의 유니온 타입이라면 in으로 분기가능
+interface BasicNoticeDialogProps {
+  noticeTitle: string;
+  noticeBody: string;
+}
+
+interface NoticeDialogWithCookieProps {
+  cookieKey: string;
+  noForADay?: boolean;
+  neverAgain?: boolean;
+}
+
+export type NoticeDialogProps = BasicNoticeDialogProps | NoticeDialogWithCookieProps;
+
+if("cookieKey" in props) return <NoticeDialogWithCookie {...props}  />
+
+------------------------------------------------------------------------------------------------------------
+
+is 연산자
+=> 직접 타입 가드 함수를 제작
+=> 리턴값이 타입 명제인 함수를 정의
+=> A is B (A가 매개변수, B가 타입)
+=> 타입가드에게 매개변수의 타입을 알려줄 수 있음
+
+!! 예제 => 리턴값이 참이면 매개변수x가 DestinationCode타입
+const isDestinationCode = (x: string): x is DestinationCode => {
+  return destinationCodelist.includes(x)
+}
+
+if(isDestinationCode(str)) {
+  destinationNames.push(DestinationNameStr[str]);
+}
+
+------------------------------------------------------------------------------------------------------------

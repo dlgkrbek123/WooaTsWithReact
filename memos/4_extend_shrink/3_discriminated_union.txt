@@ -1,0 +1,78 @@
+------------------------------------------------------------------------------------------------------------
+
+식별할 수 있는 유니온은 타입좁히기에 종종 사용됨
+
+------------------------------------------------------------------------------------------------------------
+
+1. 에러 정의 예시
+
+type TextError = {
+  errorCode: string;
+  errorMessage: string;
+}
+type ToastError = {
+  errorCode: string;
+  errorMessage: string;
+  toastShowDuration: number;
+}
+type AlertError = {
+  errorCode: string;
+  errorMessage: string;
+  onConfirm: () => void;
+}
+
+type ErrorFeedbackType = TextError | ToastError | AlertError
+const errorArr: ErrorFeedbackType[] = [
+  { errorCode: "100", errorMessage: "텍스트 에러" }, // OK
+  { errorCode: "200", errorMessage: "토스트 에러", toastShowDuration: 3000 }, // OK
+  { errorCode: "300", errorMessage: "텍스트 에러", onConfirm: () => {} }, // OK
+  { errorCode: "999", errorMessage: "텍스트 에러", toastShowDuration: 3000, onConfirm: () => {} },
+  // => 덕타이핑이라 에러는 안 뱉는데, 위험하다
+]
+
+------------------------------------------------------------------------------------------------------------
+
+=> |를 진짜 OR의 느낌으로 사용하려면 에러타입을 구분해야 한다.
+=> 구조는 비슷하되 서로 호환되지 않아야함
+=> 식별할 수 있는 유니온(타입 구조간 구조호환을 막기위해 구분을 위한 판별자)를 추가
+=> 판별자는 오직 하나의 정확한 값을 가지는 타입이여야함
+  => 리터럴 타입, 인스턴스화할수 있는 타입은 안됨
+  => 가능("a", "b" )
+  => 불가능(string, number, Error)
+
+
+type TextError = {
+  errorType: "TEXT"; // 추가됨
+  errorCode: string;
+  errorMessage: string;
+}
+type ToastError = {
+  errorType: "TOAST"; // 추가됨
+  errorCode: string;
+  errorMessage: string;
+  toastShowDuration: number;
+}
+type AlertError = {
+  errorType: "ALERT"; // 추가됨
+  errorCode: string;
+  errorMessage: string;
+  onConfirm: () => void;
+}
+
+type ErrorFeedbackType = TextError | ToastError | AlertError
+const errorArr: ErrorFeedbackType[] = [
+  { errorType: "TEXT",errorCode: "100", errorMessage: "텍스트 에러" }, // OK
+  { errorType: "TOAST",errorCode: "200", errorMessage: "토스트 에러", toastShowDuration: 3000 }, // OK
+  { errorType: "ALERT",errorCode: "300", errorMessage: "텍스트 에러", onConfirm: () => {} }, // OK
+  
+  { errorType: "TEXT",errorCode: "999", errorMessage: "잘못된 에러", toastShowDuration: 3000, onConfirm: () => {} },
+  // => 에러 발생, TextError 타입에는 없는 속성이 있다. 
+]
+
+------------------------------------------------------------------------------------------------------------
+
+exhaustiveCheck
+=> 함수이며, 인자는 never타입으로 선언되어 만약 값이 들어오면 에러를 뱉는다.
+=> 조건문 마지막 else에 사용하면 모든 조건문에 대하 타입분기를 강제할 수 있다.
+
+------------------------------------------------------------------------------------------------------------

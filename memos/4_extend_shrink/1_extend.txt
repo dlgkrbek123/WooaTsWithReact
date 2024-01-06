@@ -1,0 +1,137 @@
+------------------------------------------------------------------------------------------------------------
+
+타입확장 : 기존 타입을 이용해서 타입을 확장
+=> interface와 type키워드로 1차적으로 타입을 정의
+=> extends, &, | 를통해 타입을 확장
+
+타입을 속성의 집합이 아닌, 값의 집합으로 이해해야 한다.
+
+------------------------------------------------------------------------------------------------------------
+
+장점
+1. 코드 중복을 줄일 수 있다.
+
+!!          interface로 확장                 !!
+interface BaseMenuItem {
+  itemName: string | null;
+  itemImageUrl: string : null;
+  itemDiscountAmount: number;
+  stock: number | null;
+}
+
+// 메뉴 타입을 확장해 quantity만 추가하여 확장
+interface BaseCartItem extends BaseMenuItem {
+  quantity: number;
+}
+
+!!              type으로 확장                 !!
+type BaseMenuItem {
+  itemName: string | null;
+  itemImageUrl: string : null;
+  itemDiscountAmount: number;
+  stock: number | null;  
+}
+
+type BaseMenuItem = BaseMenuItem & {
+  quantity: number;
+}
+
+------------------------------------------------------------------------------------------------------------
+
+2. 유니온 타입
+=> 2개이상의 타입을 조합하여 사용
+=> 합집합, OR개념
+
+type MyUnion = A | B; // A와 B의 모든 원소가 내원소가 될 수 있다.
+
+
+!! 유니온 타입의 값으로 접근시 모든타입의 공통 속성에만 접근가능
+interface CookingStep {
+  orderId: string;
+  price: number;
+}
+
+interface DeliveryStep {
+  orderId: string;
+  time: number;
+  distance: string;
+}
+
+function getDeliveryDistance(step: CookingStep | DeliveryStep) {
+  return step.distance // 에러 발생, orderId에만 접근 가능
+}
+
+------------------------------------------------------------------------------------------------------------
+
+3. 교차타입
+=> 기존타입을 합쳐 필요한 모든 기능을 가진 하나의 타입으로 변환
+=> AND의 개념, 합침으로써 모든 속성을 가진 단일 타입
+=> 모두 만족시켜야 함
+
+!! 예제 1
+interface CookingStep {
+  orderId: string;
+  time: number;
+  price: number;
+}
+
+interface DeliveryStep {
+  orderId: string;
+  time: number;
+  distance: string;
+}
+
+type BaedalProcess = CookingStep & DeliveryStep; // 4가지 속성을 다가진 타입
+
+
+!! 예제2
+type idType = string | number;
+type Numeric = number | boolean;
+type Universal = idType & Numeric; // 둘다 만족시켜야 하므로 number가 된다
+
+------------------------------------------------------------------------------------------------------------
+
+4. extends와 교차타입
+=> interface를 extends해서 확장된 interface를 정의
+=> type에 교차타입을 적용하여 확장된 type을 정의
+=> 둘이 완전히 같지는 않다
+  => interface 확장시 이미 있던 속성을 오버라이딩하려고 하면 호환x => 에러발생
+  => 교차타입을 적용한 경우 에러는 발생안하는데 둘이 공통되는 점이 없다면 never타입이 된다.
+
+------------------------------------------------------------------------------------------------------------
+
+5. 배민 예제
+  1. 특정 메뉴를 길게누르면 gif재생
+  2. 특정메뉴는 이미지 대신 별도의 텍스트 노출
+
+interface Menu {
+  name: string;
+  image: string;
+}
+
+방법1
+=> interface에 옵셔널 속성을 추가해서 이를 사용
+=> 각 배열의 타입을 Menu[]로 설정
+=> Menu는 gif, text를 가지고 있지 않을 수 있어 undefined리턴가능
+
+interface Menu {
+  name: string;
+  image: string;
+  gif?: string; // gif 재생
+  text?: string; // 이미지 대신 텍스트 노출
+}
+
+방법2
+=> interface는 유지한채 확장된 인터페이스를 정의
+=> 각 배열에 알맞은 타입을 설정(good)
+
+interface SpecialMenu extends Menu {
+  gif : string;
+}
+
+interface PackageMenu extends Menu {
+  text: string;
+}
+
+
+------------------------------------------------------------------------------------------------------------
